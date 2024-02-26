@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Product, ProductCategory, MeasureUnit
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, ProductCategorySerializer, MeasureUnitSerializer
 from rest_framework import generics
 
 
@@ -19,6 +19,13 @@ class ProductAPIDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProductSerializer
 
 
+class ProductCategoryAPIList(generics.ListCreateAPIView):
+    queryset = ProductCategory.objects.all()
+    serializer_class = ProductCategorySerializer
 
+
+class MeasureUnitAPIList(generics.ListCreateAPIView):
+    queryset = MeasureUnit.objects.all()
+    serializer_class = MeasureUnitSerializer
 
 
