@@ -1,5 +1,14 @@
 from django.contrib import admin
-from .models import Product, ProductCategory, MeasureUnit, MyCompany, Partner
+from .models import (Product,
+                     ProductCategory,
+                     MeasureUnit,
+                     MyCompany,
+                     Partner,
+                     Bank,
+                     MyBankAccount,
+                     PartnerBankAccount,
+                     Operation,
+                     )
 
 
 admin.site.register(Product)
@@ -9,5 +18,8 @@ admin.site.register(MeasureUnit)
 admin.site.register(MyCompany)
 admin.site.register(Partner)
 
-
+admin.site.register(Bank)
+admin.site.register(MyBankAccount)
+admin.site.register(PartnerBankAccount)
+admin.site.register(Operation)
 

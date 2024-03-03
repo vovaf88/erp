@@ -1,5 +1,13 @@
 from rest_framework import serializers
-from .models import Product, ProductCategory, MeasureUnit, Partner, MyCompany
+from .models import (Product,
+                     ProductCategory,
+                     MeasureUnit,
+                     Partner,
+                     MyCompany,
+                     Bank,
+                     MyBankAccount,
+                     PartnerBankAccount,
+                     )
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -30,3 +38,22 @@ class MyCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = MyCompany
         fields = ('__all__')
+
+
+class MyBankAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyBankAccount
+        fields = ('__all__')
+
+
+class PartnerBankAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PartnerBankAccount
+        fields = ('__all__')
+
+
+class BankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bank
+        fields = ('__all__')
+
