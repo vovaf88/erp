@@ -7,6 +7,8 @@ from .models import (Product,
                      Bank,
                      MyBankAccount,
                      PartnerBankAccount,
+                     Mytestdoc1,
+                     Mytesttab1,
                      )
 from .serializers import (ProductSerializer,
                           ProductCategorySerializer,
@@ -16,8 +18,13 @@ from .serializers import (ProductSerializer,
                           BankSerializer,
                           MyBankAccountSerializer,
                           PartnerBankAccountSerializer,
+                          Mytesttab1Serializer,
+                          Mytestdoc1DetailSerializer,
+                          Mytestdoc1ListSerializer,
                           )
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 
 # Product
@@ -116,6 +123,31 @@ class PartnerBankAccountAPIUpdate(generics.UpdateAPIView):
 class PartnerBankAccountAPIDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = PartnerBankAccount.objects.all()
     serializer_class = PartnerBankAccountSerializer
+
+
+class Mytestdoc1ListView(APIView):
+    def get(self, request):
+        docs = Mytestdoc1.objects.all()
+        serializer = Mytestdoc1ListSerializer(docs, many=True)
+        return Response(serializer.data)
+
+
+class Mytestdoc1DetailView(APIView):
+    def get(self, request, pk):
+        docs = Mytestdoc1.objects.get(id=pk)
+        serializer = Mytestdoc1DetailSerializer(docs)
+        return Response(serializer.data)
+
+
+class Mytesttab1CreateView(APIView):
+    def post(self, request):
+        tab = Mytesttab1Serializer(data=request.data)
+        if tab.is_valid():
+            tab.save()
+        return Response(status=201)
+
+
+
 
 
 

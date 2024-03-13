@@ -17,6 +17,9 @@ from .views import (ProductAPIList,
                     BankAPIList,
                     BankAPIDetail,
                     BankAPIUpdate,
+                    Mytestdoc1DetailView,
+                    Mytestdoc1ListView,
+                    Mytesttab1CreateView,
                     )
 
 
@@ -24,6 +27,7 @@ urlpatterns = [
     path('products/', ProductAPIList.as_view()),
     path('products/<int:pk>/', ProductAPIDetail.as_view()),
     path('productupdate/<int:pk>/', ProductAPIUpdate.as_view()),
+
     path('product-categories/', ProductCategoryAPIList.as_view()),
     path('measureunits/', MeasureUnitAPIList.as_view()),
 
@@ -44,6 +48,10 @@ urlpatterns = [
     path('partnerbankaccounts/', PartnerBankAccountAPIList.as_view()),
     path('partnerbankaccounts/<int:pk>/', PartnerBankAccountAPIDetail.as_view()),
     path('partnerbankaccountupdate/<int:pk>/', PartnerBankAccountAPIUpdate.as_view()),
+
+    path('docs/', Mytestdoc1ListView.as_view()),
+    path('docs/<int:pk>/', Mytestdoc1DetailView.as_view()),
+    path('tabscreate/', Mytesttab1CreateView.as_view()),
 
 ]
 

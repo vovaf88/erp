@@ -7,6 +7,8 @@ from .models import (Product,
                      Bank,
                      MyBankAccount,
                      PartnerBankAccount,
+                     Mytesttab1,
+                     Mytestdoc1,
                      )
 
 
@@ -40,16 +42,26 @@ class MyCompanySerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 
+class MyCompanyForBankAccSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyCompany
+        fields = ['name']
+
+
 class MyBankAccountSerializer(serializers.ModelSerializer):
+    bank = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    owner = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
         model = MyBankAccount
-        fields = ('__all__')
+        fields = ['id', 'number', 'owner', 'bank']
 
 
 class PartnerBankAccountSerializer(serializers.ModelSerializer):
+    bank = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    owner = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
         model = PartnerBankAccount
-        fields = ('__all__')
+        fields = ['id', 'number', 'owner', 'bank']
 
 
 class BankSerializer(serializers.ModelSerializer):
@@ -57,3 +69,21 @@ class BankSerializer(serializers.ModelSerializer):
         model = Bank
         fields = ('__all__')
 
+
+class Mytesttab1Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mytesttab1
+        fields = ('__all__')
+
+
+class Mytestdoc1DetailSerializer(serializers.ModelSerializer):
+    tabs = Mytesttab1Serializer(many=True)
+    class Meta:
+        model = Mytestdoc1
+        fields = ('__all__')
+
+
+class Mytestdoc1ListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mytestdoc1
+        fields = ('__all__')

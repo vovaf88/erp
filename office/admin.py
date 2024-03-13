@@ -8,6 +8,8 @@ from .models import (Product,
                      MyBankAccount,
                      PartnerBankAccount,
                      Operation,
+                     Mytestdoc1,
+                     Mytesttab1
                      )
 
 
@@ -23,3 +25,5 @@ admin.site.register(MyBankAccount)
 admin.site.register(PartnerBankAccount)
 admin.site.register(Operation)
 
+admin.site.register(Mytestdoc1)
+admin.site.register(Mytesttab1)

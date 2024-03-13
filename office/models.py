@@ -100,3 +100,22 @@ class Doc(models.Model):
 
     def __str__(self):
         return f'{self.operation} номер {self.number} от {self.doc_date}'
+
+
+class Mytestdoc1(models.Model):
+    number = models.CharField(max_length=7)
+    doc_date = models.DateTimeField()
+    summa = models.IntegerField()
+
+    def __str__(self):
+        return self.number
+
+
+class Mytesttab1(models.Model):
+    doc = models.ForeignKey(Mytestdoc1, on_delete=models.CASCADE, related_name="tabs")
+    tovar = models.CharField(max_length=20)
+    count = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.doc} {self.pk} {self.tovar}'
+
