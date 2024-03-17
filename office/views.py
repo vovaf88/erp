@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
+from .service import PartnerFilter, ProductFilter
 from .models import (Product,
                      ProductCategory,
                      MeasureUnit,
@@ -31,7 +33,8 @@ from rest_framework.response import Response
 class ProductAPIList(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = ProductFilter
 
 class ProductAPIUpdate(generics.UpdateAPIView):
     queryset = Product.objects.all()
@@ -59,6 +62,8 @@ class MeasureUnitAPIList(generics.ListCreateAPIView):
 class PartnerAPIList(generics.ListCreateAPIView):
     queryset = Partner.objects.all()
     serializer_class = PartnerSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = PartnerFilter
 
 
 class PartnerAPIUpdate(generics.UpdateAPIView):

@@ -13,9 +13,12 @@ from .models import (Product,
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    measure_unit = serializers.SlugRelatedField(slug_field='name', read_only=False, queryset=MeasureUnit.objects.all())
+    category = serializers.SlugRelatedField(slug_field='name', read_only=False, queryset=ProductCategory.objects.all())
+
     class Meta:
         model = Product
-        fields = ('__all__')
+        fields = ['id', 'name', 'description', 'measure_unit', 'category', 'price', 'service']
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -51,6 +54,7 @@ class MyCompanyForBankAccSerializer(serializers.ModelSerializer):
 class MyBankAccountSerializer(serializers.ModelSerializer):
     bank = serializers.SlugRelatedField(slug_field='name', read_only=True)
     owner = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
     class Meta:
         model = MyBankAccount
         fields = ['id', 'number', 'owner', 'bank']
@@ -59,6 +63,7 @@ class MyBankAccountSerializer(serializers.ModelSerializer):
 class PartnerBankAccountSerializer(serializers.ModelSerializer):
     bank = serializers.SlugRelatedField(slug_field='name', read_only=True)
     owner = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
     class Meta:
         model = PartnerBankAccount
         fields = ['id', 'number', 'owner', 'bank']
@@ -78,12 +83,15 @@ class Mytesttab1Serializer(serializers.ModelSerializer):
 
 class Mytestdoc1DetailSerializer(serializers.ModelSerializer):
     tabs = Mytesttab1Serializer(many=True)
+    #products = ProductSerializer(many=True)
+
     class Meta:
         model = Mytestdoc1
-        fields = ('__all__')
+        fields = ('id', 'number', 'doc_date', 'summa', 'tabs')
 
 
 class Mytestdoc1ListSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Mytestdoc1
         fields = ('__all__')
