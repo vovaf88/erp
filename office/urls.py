@@ -20,6 +20,9 @@ from .views import (ProductAPIList,
                     Mytestdoc1DetailView,
                     Mytestdoc1ListView,
                     Mytesttab1CreateView,
+                    PurchaseOfGoodListView,
+                    PurchaseOfGoodDetailView,
+                    StrOfTabPurchaseOfGoodCreateView,
                     )
 
 
@@ -52,6 +55,10 @@ urlpatterns = [
     path('docs/', Mytestdoc1ListView.as_view()),
     path('docs/<int:pk>/', Mytestdoc1DetailView.as_view()),
     path('tabscreate/', Mytesttab1CreateView.as_view()),
+
+    path('purchase/', PurchaseOfGoodListView.as_view()),
+    path('purchase/<int:pk>', PurchaseOfGoodDetailView.as_view()),
+    path('tabpurchasecreate/', StrOfTabPurchaseOfGoodCreateView.as_view()),
 
 ]
 

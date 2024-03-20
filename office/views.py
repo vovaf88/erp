@@ -11,6 +11,11 @@ from .models import (Product,
                      PartnerBankAccount,
                      Mytestdoc1,
                      Mytesttab1,
+                     PurchaseOfGood,
+                     StrOfTabPurchaseOfGood,
+                     StrOfTabSaleOfGood,
+                     SaleOfGood,
+                     RemainingStock,
                      )
 from .serializers import (ProductSerializer,
                           ProductCategorySerializer,
@@ -23,6 +28,9 @@ from .serializers import (ProductSerializer,
                           Mytesttab1Serializer,
                           Mytestdoc1DetailSerializer,
                           Mytestdoc1ListSerializer,
+                          PurchaseOfGoodListSerializer,
+                          PurchaseOfGoodDetailSerializer,
+                          StrOfTabPurchaseOfGoodListSerializer,
                           )
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -130,6 +138,7 @@ class PartnerBankAccountAPIDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PartnerBankAccountSerializer
 
 
+# Test document
 class Mytestdoc1ListView(APIView):
     def get(self, request):
         docs = Mytestdoc1.objects.all()
@@ -152,6 +161,26 @@ class Mytesttab1CreateView(APIView):
         return Response(status=201)
 
 
+# Documents
+class PurchaseOfGoodListView(generics.ListCreateAPIView):
+    queryset = PurchaseOfGood.objects.all()
+    serializer_class = PurchaseOfGoodListSerializer
+
+
+class PurchaseOfGoodDetailView(APIView):
+    def get(self, request, pk):
+        doc = PurchaseOfGood.objects.get(id=pk)
+        serializer = PurchaseOfGoodDetailSerializer(doc)
+        return Response(serializer.data)
+
+
+class StrOfTabPurchaseOfGoodCreateView(APIView):
+
+    def post(self, request):
+        tab = StrOfTabPurchaseOfGoodSerializer(data=request.data)
+        if tab.is_valid():
+            tab.save()
+        return Response(status=201)
 
 
 

@@ -9,6 +9,11 @@ from .models import (Product,
                      PartnerBankAccount,
                      Mytesttab1,
                      Mytestdoc1,
+                     PurchaseOfGood,
+                     StrOfTabPurchaseOfGood,
+                     StrOfTabSaleOfGood,
+                     SaleOfGood,
+                     RemainingStock,
                      )
 
 
@@ -75,6 +80,7 @@ class BankSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 
+# test doc
 class Mytesttab1Serializer(serializers.ModelSerializer):
     class Meta:
         model = Mytesttab1
@@ -95,3 +101,28 @@ class Mytestdoc1ListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mytestdoc1
         fields = ('__all__')
+
+
+# Documents
+# Purchase
+class PurchaseOfGoodListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PurchaseOfGood
+        fields = ('__all__')
+
+
+class StrOfTabPurchaseOfGoodListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = StrOfTabPurchaseOfGood
+        fields = ('__all__')
+
+
+class PurchaseOfGoodDetailSerializer(serializers.ModelSerializer):
+    str_purchase = StrOfTabPurchaseOfGoodListSerializer(many=True)
+
+    class Meta:
+        model = PurchaseOfGood
+        fields = ('id', 'number', 'operation', 'my_company', 'partner', 'summa', 'str_purchase')
+

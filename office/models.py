@@ -88,6 +88,9 @@ class MyBankAccount(BankAccount):
 class Operation(models.Model):
     name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 class Doc(models.Model):
     number = models.CharField(max_length=7)
@@ -118,4 +121,52 @@ class Mytesttab1(models.Model):
 
     def __str__(self):
         return f'{self.doc} {self.pk} {self.tovar}'
+
+
+class TradeDoc(Doc):
+    operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, blank=True, null=True, related_name='trade_doc')
+    my_company = models.ForeignKey(MyCompany, on_delete=models.CASCADE, related_name='trade_doc')
+
+
+class BankDoc(Doc):
+    pass
+
+
+class TabDoc(models.Model):
+    pass
+
+
+class PurchaseOfGood(TradeDoc):
+    partner = models.ForeignKey(Partner, blank=True, null=True, on_delete=models.SET_NULL, related_name='purchase')
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
+
+
+class StrOfTabPurchaseOfGood(TabDoc):
+    doc = models.ForeignKey(PurchaseOfGood, on_delete=models.CASCADE, related_name='str_purchase')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='str_purchase')
+    count = models.DecimalField(max_digits=6, decimal_places=3)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
+
+
+class SaleOfGood(TradeDoc):
+    partner = models.ForeignKey(Partner, blank=True, null=True, on_delete=models.SET_NULL, related_name='sale')
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
+
+
+class StrOfTabSaleOfGood(TabDoc):
+    doc = models.ForeignKey(SaleOfGood, on_delete=models.CASCADE, related_name='str_sale')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='str_sale')
+    count = models.DecimalField(max_digits=6, decimal_places=3)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
+
+
+class RemainingStock(models.Model):
+    doc = models.ForeignKey(TradeDoc, on_delete=models.CASCADE, related_name='stock')
+    str_doc = models.ForeignKey(TabDoc, on_delete=models.CASCADE, related_name='stock')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='stock')
+    count = models.DecimalField(max_digits=6, decimal_places=3)
+
+
 

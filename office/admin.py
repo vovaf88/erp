@@ -9,7 +9,12 @@ from .models import (Product,
                      PartnerBankAccount,
                      Operation,
                      Mytestdoc1,
-                     Mytesttab1
+                     Mytesttab1,
+                     PurchaseOfGood,
+                     StrOfTabPurchaseOfGood,
+                     SaleOfGood,
+                     StrOfTabSaleOfGood,
+                     RemainingStock,
                      )
 
 
@@ -27,3 +32,12 @@ admin.site.register(Operation)
 
 admin.site.register(Mytestdoc1)
 admin.site.register(Mytesttab1)
+
+# Documents
+admin.site.register(PurchaseOfGood)
+admin.site.register(StrOfTabPurchaseOfGood)
+admin.site.register(SaleOfGood)
+admin.site.register(StrOfTabSaleOfGood)
+
+# Registers
+admin.site.register(RemainingStock)
