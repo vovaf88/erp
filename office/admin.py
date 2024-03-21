@@ -15,6 +15,8 @@ from .models import (Product,
                      SaleOfGood,
                      StrOfTabSaleOfGood,
                      RemainingStock,
+                     CostOfGoods,
+                     SettlementsWithPartners,
                      )
 
 
@@ -41,3 +43,6 @@ admin.site.register(StrOfTabSaleOfGood)
 
 # Registers
 admin.site.register(RemainingStock)
+admin.site.register(CostOfGoods)
+admin.site.register(SettlementsWithPartners)
+

@@ -169,4 +169,16 @@ class RemainingStock(models.Model):
     count = models.DecimalField(max_digits=6, decimal_places=3)
 
 
+class CostOfGoods(models.Model):
+    doc = models.ForeignKey(TradeDoc, on_delete=models.CASCADE, related_name='cost_of_goods')
+    str_doc = models.ForeignKey(TabDoc, on_delete=models.CASCADE, related_name='cost_of_goods')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='cost_of_goods')
+    count = models.DecimalField(max_digits=6, decimal_places=3)
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
+
+
+class SettlementsWithPartners(models.Model):
+    doc = models.ForeignKey(TradeDoc, on_delete=models.CASCADE, related_name='settelments')
+    partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name='settelments')
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
 
