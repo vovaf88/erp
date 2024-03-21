@@ -27,7 +27,7 @@ from .views import (ProductAPIList,
 
 
 urlpatterns = [
-    path('products/', ProductAPIList.as_view()),
+    path('products/', ProductAPIList.as_view(), name="products-list"),
     path('products/<int:pk>/', ProductAPIDetail.as_view()),
     path('productupdate/<int:pk>/', ProductAPIUpdate.as_view()),
 

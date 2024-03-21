@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
+from .record_to_registers import add_goods_to_stock
 from .service import PartnerFilter, ProductFilter
 from .models import (Product,
                      ProductCategory,
@@ -174,12 +175,15 @@ class PurchaseOfGoodDetailView(APIView):
         return Response(serializer.data)
 
 
-class StrOfTabPurchaseOfGoodCreateView(APIView):
+class StrOfTabPurchaseOfGoodCreateView(generics.CreateAPIView):
+    queryset = StrOfTabPurchaseOfGood.objects.all()
+    serializer_class = StrOfTabPurchaseOfGoodListSerializer
 
     def post(self, request):
-        tab = StrOfTabPurchaseOfGoodSerializer(data=request.data)
+        tab = StrOfTabPurchaseOfGoodListSerializer(data=request.data)
         if tab.is_valid():
             tab.save()
+        add_goods_to_stock(tab.data)
         return Response(status=201)
 
 
