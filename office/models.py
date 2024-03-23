@@ -182,3 +182,12 @@ class SettlementsWithPartners(models.Model):
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name='settelments')
     summa = models.DecimalField(max_digits=8, decimal_places=2)
 
+
+class Revenue(models.Model):
+    doc = models.ForeignKey(TradeDoc, on_delete=models.CASCADE, related_name='revenue')
+    str_doc = models.ForeignKey(TabDoc, on_delete=models.CASCADE, related_name='revenue')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='revenue')
+    count = models.DecimalField(max_digits=6, decimal_places=3)
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
+
+

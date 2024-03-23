@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from .record_to_registers import add_goods_to_stock
+from .record_to_registers import add_goods_to_stock, remove_goods_from_stock
 from .service import PartnerFilter, ProductFilter
 from .models import (Product,
                      ProductCategory,
@@ -32,6 +32,9 @@ from .serializers import (ProductSerializer,
                           PurchaseOfGoodListSerializer,
                           PurchaseOfGoodDetailSerializer,
                           StrOfTabPurchaseOfGoodListSerializer,
+                          SaleOfGoodListSerializer,
+                          SaleOfGoodDetailSerializer,
+                          StrOfTabSaleOfGoodListSerializer,
                           )
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -163,6 +166,7 @@ class Mytesttab1CreateView(APIView):
 
 
 # Documents
+# PurchaseOfGood
 class PurchaseOfGoodListView(generics.ListCreateAPIView):
     queryset = PurchaseOfGood.objects.all()
     serializer_class = PurchaseOfGoodListSerializer
@@ -187,5 +191,30 @@ class StrOfTabPurchaseOfGoodCreateView(generics.CreateAPIView):
         return Response(status=201)
 
 
+# SaleOfGood
+class SaleOfGoodListView(generics.ListCreateAPIView):
+    queryset = SaleOfGood.objects.all()
+    serializer_class = SaleOfGoodListSerializer
 
+
+class SaleOfGoodDetailView(APIView):
+    def get(self, request, pk):
+        doc = SaleOfGood.objects.get(id=pk)
+        serializer = SaleOfGoodDetailSerializer(doc)
+        return Response(serializer.data)
+
+
+class StrOfTabSaleOfGoodCreateView(generics.CreateAPIView):
+    queryset = StrOfTabSaleOfGood.objects.all()
+    serializer_class = StrOfTabSaleOfGoodListSerializer
+
+    def post(self, request):
+        tab = StrOfTabSaleOfGoodListSerializer(data=request.data)
+        if tab.is_valid():
+            tab.save()
+        success = remove_goods_from_stock(tab.data)
+        if success:
+            return Response(status=201)
+        else:
+            return Response(status=403)
 

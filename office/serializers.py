@@ -126,3 +126,27 @@ class PurchaseOfGoodDetailSerializer(serializers.ModelSerializer):
         model = PurchaseOfGood
         fields = ('id', 'number', 'operation', 'my_company', 'partner', 'summa', 'str_purchase')
 
+
+# Sale
+class SaleOfGoodListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SaleOfGood
+        fields = ('__all__')
+
+
+class StrOfTabSaleOfGoodListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = StrOfTabSaleOfGood
+        fields = ('__all__')
+
+
+class SaleOfGoodDetailSerializer(serializers.ModelSerializer):
+    str_sale = StrOfTabSaleOfGoodListSerializer(many=True)
+
+    class Meta:
+        model = SaleOfGood
+        fields = ('id', 'number', 'operation', 'my_company', 'partner', 'summa', 'str_sale')
+
+
