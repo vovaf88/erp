@@ -7,13 +7,13 @@ from .models import (Product,
                      Bank,
                      MyBankAccount,
                      PartnerBankAccount,
-                     Mytesttab1,
-                     Mytestdoc1,
                      PurchaseOfGood,
                      StrOfTabPurchaseOfGood,
                      StrOfTabSaleOfGood,
                      SaleOfGood,
                      RemainingStock,
+                     MoneyOffBank,
+                     MoneyOnBank,
                      )
 
 
@@ -80,29 +80,6 @@ class BankSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 
-# test doc
-class Mytesttab1Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = Mytesttab1
-        fields = ('__all__')
-
-
-class Mytestdoc1DetailSerializer(serializers.ModelSerializer):
-    tabs = Mytesttab1Serializer(many=True)
-    #products = ProductSerializer(many=True)
-
-    class Meta:
-        model = Mytestdoc1
-        fields = ('id', 'number', 'doc_date', 'summa', 'tabs')
-
-
-class Mytestdoc1ListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Mytestdoc1
-        fields = ('__all__')
-
-
 # Documents
 # Purchase
 class PurchaseOfGoodListSerializer(serializers.ModelSerializer):
@@ -150,3 +127,33 @@ class SaleOfGoodDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'number', 'operation', 'my_company', 'partner', 'summa', 'str_sale')
 
 
+class MoneyOnBankSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MoneyOnBank
+        fields = ('__all__')
+
+
+class MoneyOnBankDetailSerializer(serializers.ModelSerializer):
+    my_company = serializers.SlugRelatedField(slug_field='name', read_only=False, queryset=MyCompany.objects.all())
+    partner = serializers.SlugRelatedField(slug_field='name', read_only=False, queryset=Partner.objects.all())
+
+    class Meta:
+        model = MoneyOnBank
+        fields = ('id', 'number', 'doc_date', 'operation', 'my_company', 'partner', 'summa')
+
+
+class MoneyOffBankSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MoneyOnBank
+        fields = ('__all__')
+
+
+class MoneyOffBankDetailSerializer(serializers.ModelSerializer):
+    my_company = serializers.SlugRelatedField(slug_field='name', read_only=False, queryset=MyCompany.objects.all())
+    partner = serializers.SlugRelatedField(slug_field='name', read_only=False, queryset=Partner.objects.all())
+
+    class Meta:
+        model = MoneyOffBank
+        fields = ('id', 'number', 'doc_date', 'operation', 'my_company', 'partner', 'summa')

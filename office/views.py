@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from .record_to_registers import add_goods_to_stock, remove_goods_from_stock
+from .record_to_registers import add_goods_to_stock, remove_goods_from_stock, increase_our_credit, decrease_our_credit
 from .service import PartnerFilter, ProductFilter
 from .models import (Product,
                      ProductCategory,
@@ -10,13 +10,13 @@ from .models import (Product,
                      Bank,
                      MyBankAccount,
                      PartnerBankAccount,
-                     Mytestdoc1,
-                     Mytesttab1,
                      PurchaseOfGood,
                      StrOfTabPurchaseOfGood,
                      StrOfTabSaleOfGood,
                      SaleOfGood,
                      RemainingStock,
+                     MoneyOnBank,
+                     MoneyOffBank,
                      )
 from .serializers import (ProductSerializer,
                           ProductCategorySerializer,
@@ -26,15 +26,16 @@ from .serializers import (ProductSerializer,
                           BankSerializer,
                           MyBankAccountSerializer,
                           PartnerBankAccountSerializer,
-                          Mytesttab1Serializer,
-                          Mytestdoc1DetailSerializer,
-                          Mytestdoc1ListSerializer,
                           PurchaseOfGoodListSerializer,
                           PurchaseOfGoodDetailSerializer,
                           StrOfTabPurchaseOfGoodListSerializer,
                           SaleOfGoodListSerializer,
                           SaleOfGoodDetailSerializer,
                           StrOfTabSaleOfGoodListSerializer,
+                          MoneyOnBankSerializer,
+                          MoneyOffBankSerializer,
+                          MoneyOffBankDetailSerializer,
+                          MoneyOnBankDetailSerializer,
                           )
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -142,29 +143,6 @@ class PartnerBankAccountAPIDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PartnerBankAccountSerializer
 
 
-# Test document
-class Mytestdoc1ListView(APIView):
-    def get(self, request):
-        docs = Mytestdoc1.objects.all()
-        serializer = Mytestdoc1ListSerializer(docs, many=True)
-        return Response(serializer.data)
-
-
-class Mytestdoc1DetailView(APIView):
-    def get(self, request, pk):
-        docs = Mytestdoc1.objects.get(id=pk)
-        serializer = Mytestdoc1DetailSerializer(docs)
-        return Response(serializer.data)
-
-
-class Mytesttab1CreateView(APIView):
-    def post(self, request):
-        tab = Mytesttab1Serializer(data=request.data)
-        if tab.is_valid():
-            tab.save()
-        return Response(status=201)
-
-
 # Documents
 # PurchaseOfGood
 class PurchaseOfGoodListView(generics.ListCreateAPIView):
@@ -217,4 +195,51 @@ class StrOfTabSaleOfGoodCreateView(generics.CreateAPIView):
             return Response(status=201)
         else:
             return Response(status=403)
+
+
+# Money on bank account
+class MoneyOnBankAPIList(generics.ListCreateAPIView):
+    queryset = MoneyOnBank.objects.all()
+    serializer_class = MoneyOnBankSerializer
+
+    def post(self, request):
+        doc = MoneyOnBankSerializer(data=request.data)
+        if doc.is_valid():
+            doc.save()
+        increase_our_credit(doc.data)
+        return Response(status=201)
+
+
+class MoneyOnBankAPIUpdate(generics.UpdateAPIView):
+    queryset = MoneyOnBank.objects.all()
+    serializer_class = MoneyOnBankDetailSerializer
+
+
+class MoneyOnBankAPIDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MoneyOnBank.objects.all()
+    serializer_class = MoneyOnBankSerializer
+
+
+# Money off bank account
+class MoneyOffBankAPIList(generics.ListCreateAPIView):
+    queryset = MoneyOffBank.objects.all()
+    serializer_class = MoneyOffBankSerializer
+
+    def post(self, request):
+        doc = MoneyOffBankSerializer(data=request.data)
+        if doc.is_valid():
+            doc.save()
+        decrease_our_credit(doc.data)
+        return Response(status=201)
+
+
+class MoneyOffBankAPIUpdate(generics.UpdateAPIView):
+    queryset = MoneyOffBank.objects.all()
+    serializer_class = MoneyOffBankSerializer
+
+
+class MoneyOffBankAPIDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MoneyOffBank.objects.all()
+    serializer_class = MoneyOffBankDetailSerializer
+
 

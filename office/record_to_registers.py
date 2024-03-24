@@ -7,7 +7,10 @@ from .models import (StrOfTabPurchaseOfGood,
                      SettlementsWithPartners,
                      Revenue,
                      SaleOfGood,
-                     StrOfTabSaleOfGood)
+                     StrOfTabSaleOfGood,
+                     MoneyOnBank,
+                     MoneyOffBank,
+                     Partner)
 
 
 def add_goods_to_stock(data):
@@ -101,3 +104,23 @@ def remove_goods_from_stock(data):
     )
 
     return True
+
+
+def increase_our_credit(bank_doc):
+    # {'id': 4, 'number': '3', 'doc_date': '2024-03-24T16:30:00Z', 'summa': '1000.00', 'operation': 3, 'my_company': 1, 'partner': 6}
+    SettlementsWithPartners.objects.create(
+        doc=MoneyOnBank.objects.get(id=bank_doc['id']),
+        summa=float(bank_doc['summa']),
+        partner=Partner.objects.get(id=bank_doc['partner'])
+    )
+
+
+
+def decrease_our_credit(bank_doc):
+    SettlementsWithPartners.objects.create(
+        doc=MoneyOffBank.objects.get(id=bank_doc['id']),
+        summa=-float(bank_doc['summa']),
+        partner=Partner.objects.get(id=bank_doc['partner'])
+    )
+
+

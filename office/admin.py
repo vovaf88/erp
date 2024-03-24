@@ -7,9 +7,6 @@ from .models import (Product,
                      Bank,
                      MyBankAccount,
                      PartnerBankAccount,
-                     Operation,
-                     Mytestdoc1,
-                     Mytesttab1,
                      PurchaseOfGood,
                      StrOfTabPurchaseOfGood,
                      SaleOfGood,
@@ -17,6 +14,8 @@ from .models import (Product,
                      RemainingStock,
                      CostOfGoods,
                      SettlementsWithPartners,
+                     MoneyOnBank,
+                     MoneyOffBank,
                      )
 
 
@@ -30,16 +29,14 @@ admin.site.register(Partner)
 admin.site.register(Bank)
 admin.site.register(MyBankAccount)
 admin.site.register(PartnerBankAccount)
-admin.site.register(Operation)
-
-admin.site.register(Mytestdoc1)
-admin.site.register(Mytesttab1)
 
 # Documents
 admin.site.register(PurchaseOfGood)
 admin.site.register(StrOfTabPurchaseOfGood)
 admin.site.register(SaleOfGood)
 admin.site.register(StrOfTabSaleOfGood)
+admin.site.register(MoneyOnBank)
+admin.site.register(MoneyOffBank)
 
 # Registers
 admin.site.register(RemainingStock)

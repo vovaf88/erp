@@ -17,15 +17,18 @@ from .views import (ProductAPIList,
                     BankAPIList,
                     BankAPIDetail,
                     BankAPIUpdate,
-                    Mytestdoc1DetailView,
-                    Mytestdoc1ListView,
-                    Mytesttab1CreateView,
                     PurchaseOfGoodListView,
                     PurchaseOfGoodDetailView,
                     StrOfTabPurchaseOfGoodCreateView,
                     SaleOfGoodListView,
                     SaleOfGoodDetailView,
                     StrOfTabSaleOfGoodCreateView,
+                    MoneyOffBankAPIList,
+                    MoneyOffBankAPIDetail,
+                    MoneyOffBankAPIUpdate,
+                    MoneyOnBankAPIUpdate,
+                    MoneyOnBankAPIList,
+                    MoneyOnBankAPIDetail,
                     )
 
 
@@ -55,10 +58,6 @@ urlpatterns = [
     path('partnerbankaccounts/<int:pk>/', PartnerBankAccountAPIDetail.as_view()),
     path('partnerbankaccountupdate/<int:pk>/', PartnerBankAccountAPIUpdate.as_view()),
 
-    path('docs/', Mytestdoc1ListView.as_view()),
-    path('docs/<int:pk>/', Mytestdoc1DetailView.as_view()),
-    path('tabscreate/', Mytesttab1CreateView.as_view()),
-
     path('purchase/', PurchaseOfGoodListView.as_view()),
     path('purchase/<int:pk>', PurchaseOfGoodDetailView.as_view()),
     path('tabpurchasecreate/', StrOfTabPurchaseOfGoodCreateView.as_view()),
@@ -66,6 +65,14 @@ urlpatterns = [
     path('sale/', SaleOfGoodListView.as_view()),
     path('sale/<int:pk>', SaleOfGoodDetailView.as_view()),
     path('tabsalecreate/', StrOfTabSaleOfGoodCreateView.as_view()),
+
+    path('moneyon/', MoneyOnBankAPIList.as_view()),
+    path('moneyon/<int:pk>/', MoneyOnBankAPIDetail.as_view()),
+    path('moneyonupdate/<int:pk>/', MoneyOnBankAPIUpdate.as_view()),
+
+    path('moneyoff/', MoneyOffBankAPIList.as_view()),
+    path('moneyoff/<int:pk>/', MoneyOffBankAPIDetail.as_view()),
+    path('moneyoffupdate/<int:pk>/', MoneyOffBankAPIUpdate.as_view()),
 
 ]
 

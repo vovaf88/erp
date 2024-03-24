@@ -1,4 +1,14 @@
 from django.db import models
+import datetime
+from django.utils.timezone import now
+
+
+DOCUMENT_TYPE = {
+    'Sell': "Продажа",
+    'Buy': "Покупка",
+    'Bank_on': "Поступление денег",
+    'Bank_off': "Списание денег",
+}
 
 
 class Company(models.Model):
@@ -85,47 +95,15 @@ class MyBankAccount(BankAccount):
         return f'{self.owner} - {self.number}'
 
 
-class Operation(models.Model):
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
-
-
 class Doc(models.Model):
-    number = models.CharField(max_length=7)
-    doc_date = models.DateTimeField()
-    operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, blank=True, null=True, related_name='doc')
-    my_company = models.ForeignKey(MyCompany, on_delete=models.CASCADE, related_name='doc')
-
-    class Meta:
-        abstract = True
+    operation = models.CharField(choices=DOCUMENT_TYPE, max_length=20)
 
     def __str__(self):
-        return f'{self.operation} номер {self.number} от {self.doc_date}'
-
-
-class Mytestdoc1(models.Model):
-    number = models.CharField(max_length=7)
-    doc_date = models.DateTimeField()
-    summa = models.IntegerField()
-
-    def __str__(self):
-        return self.number
-
-
-class Mytesttab1(models.Model):
-    doc = models.ForeignKey(Mytestdoc1, on_delete=models.CASCADE, related_name="tabs")
-    tovar = models.CharField(max_length=20)
-    count = models.IntegerField()
-
-    def __str__(self):
-        return f'{self.doc} {self.pk} {self.tovar}'
+        return f'{DOCUMENT_TYPE[self.operation]} номер {self.pk}'
 
 
 class TradeDoc(Doc):
-    operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, blank=True, null=True, related_name='trade_doc')
-    my_company = models.ForeignKey(MyCompany, on_delete=models.CASCADE, related_name='trade_doc')
+    pass
 
 
 class BankDoc(Doc):
@@ -137,6 +115,10 @@ class TabDoc(models.Model):
 
 
 class PurchaseOfGood(TradeDoc):
+    number = models.CharField(max_length=7, blank=True, null=True,)
+    doc_date = models.DateTimeField()
+    #operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, blank=True, null=True, related_name='purchase')
+    my_company = models.ForeignKey(MyCompany, on_delete=models.CASCADE, blank=True, null=True, related_name='purchase')
     partner = models.ForeignKey(Partner, blank=True, null=True, on_delete=models.SET_NULL, related_name='purchase')
     summa = models.DecimalField(max_digits=8, decimal_places=2)
 
@@ -150,6 +132,11 @@ class StrOfTabPurchaseOfGood(TabDoc):
 
 
 class SaleOfGood(TradeDoc):
+    number = models.CharField(max_length=7, blank=True, null=True,)
+    doc_date = models.DateTimeField()
+    #operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, blank=True, null=True, related_name='sale')
+    my_company = models.ForeignKey(MyCompany, on_delete=models.CASCADE, blank=True, null=True,
+                                   related_name='sale')
     partner = models.ForeignKey(Partner, blank=True, null=True, on_delete=models.SET_NULL, related_name='sale')
     summa = models.DecimalField(max_digits=8, decimal_places=2)
 
@@ -178,7 +165,7 @@ class CostOfGoods(models.Model):
 
 
 class SettlementsWithPartners(models.Model):
-    doc = models.ForeignKey(TradeDoc, on_delete=models.CASCADE, related_name='settelments')
+    doc = models.ForeignKey(Doc, on_delete=models.CASCADE, related_name='settelments')
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name='settelments')
     summa = models.DecimalField(max_digits=8, decimal_places=2)
 
@@ -190,4 +177,29 @@ class Revenue(models.Model):
     count = models.DecimalField(max_digits=6, decimal_places=3)
     summa = models.DecimalField(max_digits=8, decimal_places=2)
 
+
+class MoneyOnBank(BankDoc):
+    number = models.CharField(max_length=7, blank=True, null=True,)
+    doc_date = models.DateTimeField()
+    #operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, blank=True, null=True, related_name='moneyon')
+    my_company = models.ForeignKey(MyCompany, on_delete=models.CASCADE, blank=True, null=True,
+                                   related_name='moneyon')
+    partner = models.ForeignKey(Partner, blank=True, null=True, on_delete=models.SET_NULL, related_name='moneyon')
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
+
+    def __str__(self):
+        return f'Поступление на счет от {self.partner}'
+
+
+class MoneyOffBank(BankDoc):
+    number = models.CharField(max_length=7, blank=True, null=True,)
+    doc_date = models.DateTimeField()
+    #operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, blank=True, null=True, related_name='moneyoff')
+    my_company = models.ForeignKey(MyCompany, on_delete=models.CASCADE, blank=True, null=True,
+                                   related_name='moneyoff')
+    partner = models.ForeignKey(Partner, blank=True, null=True, on_delete=models.SET_NULL, related_name='moneyoff')
+    summa = models.DecimalField(max_digits=8, decimal_places=2)
+
+    def __str__(self):
+        return f'Списание со счета партнеру {self.partner}'
 
