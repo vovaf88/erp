@@ -131,7 +131,7 @@ class MoneyOnBankSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MoneyOnBank
-        fields = ('__all__')
+        fields = ('id', 'number', 'doc_date', 'operation', 'my_company', 'partner', 'summa')
 
 
 class MoneyOnBankDetailSerializer(serializers.ModelSerializer):
@@ -146,8 +146,8 @@ class MoneyOnBankDetailSerializer(serializers.ModelSerializer):
 class MoneyOffBankSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = MoneyOnBank
-        fields = ('__all__')
+        model = MoneyOffBank
+        fields = ('id', 'number', 'doc_date', 'operation', 'my_company', 'partner', 'summa')
 
 
 class MoneyOffBankDetailSerializer(serializers.ModelSerializer):

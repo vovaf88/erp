@@ -188,7 +188,7 @@ class MoneyOnBank(BankDoc):
     summa = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
-        return f'Поступление на счет от {self.partner}'
+        return f'Поступление на счет от {self.partner} #{self.pk}'
 
 
 class MoneyOffBank(BankDoc):
@@ -201,5 +201,5 @@ class MoneyOffBank(BankDoc):
     summa = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
-        return f'Списание со счета партнеру {self.partner}'
+        return f'Списание со счета партнеру {self.partner} #{self.pk}'
 

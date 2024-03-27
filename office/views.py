@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from .record_to_registers import add_goods_to_stock, remove_goods_from_stock, increase_our_credit, decrease_our_credit
+from .record_to_registers import add_goods_to_stock, remove_goods_from_stock, increase_our_credit, decrease_our_credit, update_our_credit
 from .service import PartnerFilter, ProductFilter
 from .models import (Product,
                      ProductCategory,
@@ -150,10 +150,30 @@ class PurchaseOfGoodListView(generics.ListCreateAPIView):
     serializer_class = PurchaseOfGoodListSerializer
 
 
-class PurchaseOfGoodDetailView(APIView):
+class PurchaseOfGoodDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PurchaseOfGood.objects.all()
+    serializer_class = PurchaseOfGoodListSerializer
+
     def get(self, request, pk):
         doc = PurchaseOfGood.objects.get(id=pk)
         serializer = PurchaseOfGoodDetailSerializer(doc)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        print('update sale')
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        #update_our_credit(self.request.data, instance.pk)
+
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
         return Response(serializer.data)
 
 
@@ -175,11 +195,38 @@ class SaleOfGoodListView(generics.ListCreateAPIView):
     serializer_class = SaleOfGoodListSerializer
 
 
-class SaleOfGoodDetailView(APIView):
+class SaleOfGoodDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = SaleOfGood.objects.all()
+    serializer_class = SaleOfGoodListSerializer
+
     def get(self, request, pk):
         doc = SaleOfGood.objects.get(id=pk)
         serializer = SaleOfGoodDetailSerializer(doc)
         return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        print('update sale')
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        #update_our_credit(self.request.data, instance.pk)
+
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 class StrOfTabSaleOfGoodCreateView(generics.CreateAPIView):
@@ -210,9 +257,32 @@ class MoneyOnBankAPIList(generics.ListCreateAPIView):
         return Response(status=201)
 
 
-class MoneyOnBankAPIUpdate(generics.UpdateAPIView):
+class MoneyOnBankAPIUpdate(generics.RetrieveUpdateDestroyAPIView):
     queryset = MoneyOnBank.objects.all()
-    serializer_class = MoneyOnBankDetailSerializer
+    serializer_class = MoneyOnBankSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        update_our_credit(self.request.data, instance.pk)
+
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 class MoneyOnBankAPIDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -233,9 +303,32 @@ class MoneyOffBankAPIList(generics.ListCreateAPIView):
         return Response(status=201)
 
 
-class MoneyOffBankAPIUpdate(generics.UpdateAPIView):
+class MoneyOffBankAPIUpdate(generics.RetrieveUpdateDestroyAPIView):
     queryset = MoneyOffBank.objects.all()
     serializer_class = MoneyOffBankSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        update_our_credit(self.request.data, instance.pk)
+
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 class MoneyOffBankAPIDetail(generics.RetrieveUpdateDestroyAPIView):
