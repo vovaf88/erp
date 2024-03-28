@@ -140,3 +140,11 @@ def update_our_credit(bank_doc, doc_pk):
             summa=float(bank_doc['summa']),
             partner=Partner.objects.get(id=bank_doc['partner'])
         )
+
+
+def update_str_sale(instance, request):
+    pass
+
+
+def update_str_purchase(instance, request):
+    pass

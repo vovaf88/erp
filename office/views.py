@@ -1,6 +1,13 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from .record_to_registers import add_goods_to_stock, remove_goods_from_stock, increase_our_credit, decrease_our_credit, update_our_credit
+from .record_to_registers import (add_goods_to_stock,
+                                  remove_goods_from_stock,
+                                  increase_our_credit,
+                                  decrease_our_credit,
+                                  update_our_credit,
+                                  update_str_sale,
+                                  update_str_purchase
+                                  )
 from .service import PartnerFilter, ProductFilter
 from .models import (Product,
                      ProductCategory,
@@ -176,17 +183,52 @@ class PurchaseOfGoodDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         return Response(serializer.data)
 
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
 
 class StrOfTabPurchaseOfGoodCreateView(generics.CreateAPIView):
     queryset = StrOfTabPurchaseOfGood.objects.all()
     serializer_class = StrOfTabPurchaseOfGoodListSerializer
 
-    def post(self, request):
-        tab = StrOfTabPurchaseOfGoodListSerializer(data=request.data)
-        if tab.is_valid():
-            tab.save()
-        add_goods_to_stock(tab.data)
-        return Response(status=201)
+
+class StrOfTabPurchaseOfGoodUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = StrOfTabPurchaseOfGood.objects.all()
+    serializer_class = StrOfTabPurchaseOfGoodListSerializer
+
+    # def update(self, request):
+    #     tab = StrOfTabPurchaseOfGoodListSerializer(data=request.data)
+    #     if tab.is_valid():
+    #         tab.save()
+    #     add_goods_to_stock(tab.data)
+    #     return Response(status=201)
+
+    def update(self, request, *args, **kwargs):
+        print('update sale')
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        update_str_purchase(instance, request)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 # SaleOfGood
@@ -242,6 +284,41 @@ class StrOfTabSaleOfGoodCreateView(generics.CreateAPIView):
             return Response(status=201)
         else:
             return Response(status=403)
+
+
+class StrOfTabSaleOfGoodUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = StrOfTabSaleOfGood.objects.all()
+    serializer_class = StrOfTabSaleOfGoodListSerializer
+
+    # def update(self, request):
+    #     tab = StrOfTabPurchaseOfGoodListSerializer(data=request.data)
+    #     if tab.is_valid():
+    #         tab.save()
+    #     add_goods_to_stock(tab.data)
+    #     return Response(status=201)
+
+    def update(self, request, *args, **kwargs):
+        print('update sale')
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        update_str_sale(instance, request)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 # Money on bank account
