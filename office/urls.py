@@ -70,7 +70,6 @@ urlpatterns = [
     path('tabsalecreate/', StrOfTabSaleOfGoodCreateView.as_view()),
     path('tabsaleupdate/<int:pk>/', StrOfTabSaleOfGoodUpdateView.as_view()),
 
-
     path('moneyon/', MoneyOnBankAPIList.as_view()),
     path('moneyon/<int:pk>/', MoneyOnBankAPIDetail.as_view()),
     path('moneyonupdate/<int:pk>/', MoneyOnBankAPIUpdate.as_view()),

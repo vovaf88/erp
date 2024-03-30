@@ -62,7 +62,7 @@ def remove_goods_from_stock(data):
     remainder = float(cost_summ_count['count_prod'])
     full_price = float(cost_summ_count['sum_prod'])
 
-    print('remainder= ', remainder, ', full_price= ', full_price, ', count= ', count, ', summa=', summa)
+    #print('remainder= ', remainder, ', full_price= ', full_price, ', count= ', count, ', summa=', summa)
 
     # check remainder of product
     if remainder < count:
@@ -143,8 +143,103 @@ def update_our_credit(bank_doc, doc_pk):
 
 
 def update_str_sale(instance, request):
-    pass
+    data = request.data
+    count = float(data['count'])
+    price = float(data['price'])
+    summa = float(data['summa'])
+    doc = SaleOfGood.objects.get(id=data['doc'])
+    product = Product.objects.get(id=data['product'])
+    str_doc = StrOfTabSaleOfGood.objects.get(id=instance.id)
+# {'count': ['2.000'], 'price': ['200.00'], 'summa': ['400.00'], 'doc': ['4'], 'product': ['1']}>
+
+    StrOfTabSaleOfGood.objects.filter(pk=instance.id).update(
+        count=count,
+        price=price,
+        summa=summa,
+        doc=doc,
+        product=product
+    )
+
+    RemainingStock.objects.filter(pk=instance.id).update(
+        doc=doc,
+        str_doc=str_doc,
+        product=product,
+        count=-count,
+    )
+
+    cost_summ_count = CostOfGoods.objects.filter(product=product).aggregate(sum_prod=Sum("summa"),
+                                                                            count_prod=Sum("count"))
+    remainder = float(cost_summ_count['count_prod'])
+    full_price = float(cost_summ_count['sum_prod'])
+
+    # check remainder of product
+    if remainder < count:
+        return False
+    if remainder == 0:
+        cost_price = 0
+    elif remainder == count:
+        cost_price = full_price
+    else:
+        cost_price = full_price / remainder * count
+
+    CostOfGoods.objects.filter(pk=instance.id).update(
+        doc=doc,
+        str_doc=str_doc,
+        product=product,
+        count=-count,
+        summa=-cost_price
+    )
+
+    Revenue.objects.filter(pk=instance.id).update(
+        doc=doc,
+        str_doc=str_doc,
+        product=product,
+        count=count,
+        summa=summa
+    )
+
+    SettlementsWithPartners.objects.filter(pk=instance.id).update(
+        doc=doc,
+        summa=-summa,
+        partner=doc.partner
+    )
 
 
 def update_str_purchase(instance, request):
-    pass
+    data = request.data
+    count = float(data['count'])
+    price = float(data['price'])
+    summa = float(data['summa'])
+    doc = PurchaseOfGood.objects.get(id=data['doc'])
+    product = Product.objects.get(id=data['product'])
+    str_doc = StrOfTabPurchaseOfGood.objects.get(id=instance.id)
+
+    StrOfTabPurchaseOfGood.objects.filter(pk=instance.id).update(
+        count=count,
+        price=price,
+        summa=summa,
+        doc=doc,
+        product=product
+    )
+
+    CostOfGoods.objects.filter(pk=instance.id).update(
+        doc=doc,
+        str_doc=str_doc,
+        product=product,
+        count=count,
+        summa=summa
+    )
+
+    SettlementsWithPartners.objects.filter(pk=instance.id).update(
+        doc=doc,
+        summa=summa,
+        partner=doc.partner
+    )
+
+    RemainingStock.objects.filter(pk=instance.id).update(
+        doc=doc,
+        str_doc=str_doc,
+        product=product,
+        count=count,
+    )
+

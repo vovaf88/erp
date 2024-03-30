@@ -56,6 +56,7 @@ class ProductAPIList(generics.ListCreateAPIView):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ProductFilter
 
+
 class ProductAPIUpdate(generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
