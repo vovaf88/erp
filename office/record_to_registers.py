@@ -39,11 +39,23 @@ def add_goods_to_stock(data):
         summa=summa
     )
 
-    SettlementsWithPartners.objects.create(
-        doc=doc,
-        summa=summa,
-        partner=doc.partner
-    )
+    record_of_settlements_with_partners = SettlementsWithPartners.objects.filter(doc=doc)
+    print('this doc: ', record_of_settlements_with_partners)
+    if not record_of_settlements_with_partners:
+        print('net zapisi')
+        SettlementsWithPartners.objects.create(
+            doc=doc,
+            summa=summa,
+            partner=doc.partner
+        )
+    else:
+        print('est zapis')
+        summa_str = record_of_settlements_with_partners[0].summa
+        SettlementsWithPartners.objects.filter(doc=doc).update(
+            doc=doc,
+            summa=float(summa_str)+float(summa),
+            partner=doc.partner
+        )
 
 
 def remove_goods_from_stock(data):
@@ -56,6 +68,7 @@ def remove_goods_from_stock(data):
     doc = SaleOfGood.objects.get(pk=doc_id)
     product = Product.objects.get(pk=product_id)
     str_doc = StrOfTabSaleOfGood.objects.get(pk=str_doc_id)
+    #old_sum = str_doc.summa
 
     cost_summ_count = CostOfGoods.objects.filter(product=product).aggregate(sum_prod=Sum("summa"),
                                                                             count_prod=Sum("count"))
@@ -97,11 +110,23 @@ def remove_goods_from_stock(data):
         summa=summa
     )
 
-    SettlementsWithPartners.objects.create(
-        doc=doc,
-        summa=-summa,
-        partner=doc.partner
-    )
+    record_of_settlements_with_partners = SettlementsWithPartners.objects.filter(doc=doc)
+    print('this doc: ', record_of_settlements_with_partners)
+    if not record_of_settlements_with_partners:
+        print('net zapisi')
+        SettlementsWithPartners.objects.create(
+            doc=doc,
+            summa=-summa,
+            partner=doc.partner
+        )
+    else:
+        print('est zapis')
+        summa_str = record_of_settlements_with_partners[0].summa
+        SettlementsWithPartners.objects.filter(doc=doc).update(
+            doc=doc,
+            summa=float(summa_str)-float(summa),
+            partner=doc.partner
+        )
 
     return True
 
@@ -150,6 +175,7 @@ def update_str_sale(instance, request):
     doc = SaleOfGood.objects.get(id=data['doc'])
     product = Product.objects.get(id=data['product'])
     str_doc = StrOfTabSaleOfGood.objects.get(id=instance.id)
+    old_sum = str_doc.summa
 # {'count': ['2.000'], 'price': ['200.00'], 'summa': ['400.00'], 'doc': ['4'], 'product': ['1']}>
 
     StrOfTabSaleOfGood.objects.filter(pk=instance.id).update(
@@ -198,9 +224,11 @@ def update_str_sale(instance, request):
         summa=summa
     )
 
-    SettlementsWithPartners.objects.filter(pk=instance.id).update(
+    record_of_settlements_with_partners = SettlementsWithPartners.objects.filter(doc=doc)
+    summa_str = record_of_settlements_with_partners[0].summa
+    SettlementsWithPartners.objects.filter(doc=doc).update(
         doc=doc,
-        summa=-summa,
+        summa=float(summa_str)-float(old_sum)+float(summa),
         partner=doc.partner
     )
 
@@ -213,6 +241,7 @@ def update_str_purchase(instance, request):
     doc = PurchaseOfGood.objects.get(id=data['doc'])
     product = Product.objects.get(id=data['product'])
     str_doc = StrOfTabPurchaseOfGood.objects.get(id=instance.id)
+    old_sum = str_doc.summa
 
     StrOfTabPurchaseOfGood.objects.filter(pk=instance.id).update(
         count=count,
@@ -230,9 +259,11 @@ def update_str_purchase(instance, request):
         summa=summa
     )
 
-    SettlementsWithPartners.objects.filter(pk=instance.id).update(
+    record_of_settlements_with_partners = SettlementsWithPartners.objects.filter(doc=doc)
+    summa_str = record_of_settlements_with_partners[0].summa
+    SettlementsWithPartners.objects.filter(doc=doc).update(
         doc=doc,
-        summa=summa,
+        summa=float(summa_str)-float(old_sum)+float(summa),
         partner=doc.partner
     )
 

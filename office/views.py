@@ -196,17 +196,20 @@ class StrOfTabPurchaseOfGoodCreateView(generics.CreateAPIView):
     queryset = StrOfTabPurchaseOfGood.objects.all()
     serializer_class = StrOfTabPurchaseOfGoodListSerializer
 
+    def post(self, request):
+        tab = StrOfTabPurchaseOfGoodListSerializer(data=request.data)
+        if tab.is_valid():
+            tab.save()
+        success = add_goods_to_stock(tab.data)
+        if success:
+            return Response(status=201)
+        else:
+            return Response(status=403)
+
 
 class StrOfTabPurchaseOfGoodUpdateView(generics.RetrieveUpdateDestroyAPIView):
     queryset = StrOfTabPurchaseOfGood.objects.all()
     serializer_class = StrOfTabPurchaseOfGoodListSerializer
-
-    # def update(self, request):
-    #     tab = StrOfTabPurchaseOfGoodListSerializer(data=request.data)
-    #     if tab.is_valid():
-    #         tab.save()
-    #     add_goods_to_stock(tab.data)
-    #     return Response(status=201)
 
     def update(self, request, *args, **kwargs):
         print('update sale')
