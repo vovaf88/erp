@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from .models import Product, Partner
+from .models import Product, Partner, RemainingStock
 
 
 class PartnerFilter(filters.FilterSet):
@@ -22,5 +22,13 @@ class ProductFilter(filters.FilterSet):
     class Meta:
         model = Product
         fields = ['category']
+
+
+class RemainingStockFilter(filters.FilterSet):
+    product = CharFilterInFilter(field_name='product__name', lookup_expr='in')
+
+    class Meta:
+        model = RemainingStock
+        fields = ['product']
 
 

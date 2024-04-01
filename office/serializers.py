@@ -157,3 +157,10 @@ class MoneyOffBankDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = MoneyOffBank
         fields = ('id', 'number', 'doc_date', 'operation', 'my_company', 'partner', 'summa')
+
+
+class RemainingStockSerializer(serializers.Serializer):
+    product = serializers.CharField()
+    count = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+

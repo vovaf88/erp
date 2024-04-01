@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Count, Case, When, Avg, Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from .record_to_registers import (add_goods_to_stock,
                                   remove_goods_from_stock,
@@ -8,7 +9,7 @@ from .record_to_registers import (add_goods_to_stock,
                                   update_str_sale,
                                   update_str_purchase
                                   )
-from .service import PartnerFilter, ProductFilter
+from .service import PartnerFilter, ProductFilter, RemainingStockFilter
 from .models import (Product,
                      ProductCategory,
                      MeasureUnit,
@@ -43,6 +44,7 @@ from .serializers import (ProductSerializer,
                           MoneyOffBankSerializer,
                           MoneyOffBankDetailSerializer,
                           MoneyOnBankDetailSerializer,
+                          RemainingStockSerializer,
                           )
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -416,4 +418,12 @@ class MoneyOffBankAPIDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = MoneyOffBank.objects.all()
     serializer_class = MoneyOffBankDetailSerializer
 
+
+class ReportRemainingStock(generics.ListAPIView):
+    queryset = RemainingStock.objects.all()
+    queryset = queryset.values('product').annotate(count=Sum('count'))
+
+    serializer_class = RemainingStockSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RemainingStockFilter
 
