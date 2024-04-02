@@ -32,7 +32,8 @@ from .views import (ProductAPIList,
                     MoneyOnBankAPIList,
                     MoneyOnBankAPIDetail,
                     ReportRemainingStock,
-                    ReportCostOfGoodsStock
+                    ReportCostOfGoodsStock,
+                    ReportSettlementsWithPartners
                     )
 
 
@@ -83,6 +84,7 @@ urlpatterns = [
     # reports
     path('report-remaing/', ReportRemainingStock.as_view()),
     path('report-cost/', ReportCostOfGoodsStock.as_view()),
+    path('report_settelments', ReportSettlementsWithPartners.as_view()),
 
 ]
 

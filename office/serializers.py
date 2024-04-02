@@ -14,6 +14,7 @@ from .models import (Product,
                      RemainingStock,
                      MoneyOffBank,
                      MoneyOnBank,
+                     SettlementsWithPartners
                      )
 
 
@@ -170,3 +171,6 @@ class CostOfGoodsSerializer(serializers.Serializer):
     summa = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
+class SettlementsWithPartnersSerializer(serializers.Serializer):
+    partner = serializers.CharField()
+    summa = serializers.DecimalField(max_digits=10, decimal_places=2)

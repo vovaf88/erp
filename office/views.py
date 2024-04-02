@@ -9,7 +9,7 @@ from .record_to_registers import (add_goods_to_stock,
                                   update_str_sale,
                                   update_str_purchase
                                   )
-from .service import PartnerFilter, ProductFilter, RemainingStockFilter, CostOfGoodsFilter
+from .service import PartnerFilter, ProductFilter, RemainingStockFilter, CostOfGoodsFilter, SettlementsWithPartnersFilter
 from .models import (Product,
                      ProductCategory,
                      MeasureUnit,
@@ -26,6 +26,7 @@ from .models import (Product,
                      MoneyOnBank,
                      MoneyOffBank,
                      CostOfGoods,
+                     SettlementsWithPartners
                      )
 from .serializers import (ProductSerializer,
                           ProductCategorySerializer,
@@ -46,7 +47,8 @@ from .serializers import (ProductSerializer,
                           MoneyOffBankDetailSerializer,
                           MoneyOnBankDetailSerializer,
                           RemainingStockSerializer,
-                          CostOfGoodsSerializer
+                          CostOfGoodsSerializer,
+                          SettlementsWithPartnersSerializer
                           )
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -433,9 +435,17 @@ class ReportRemainingStock(generics.ListAPIView):
 class ReportCostOfGoodsStock(generics.ListAPIView):
     queryset = CostOfGoods.objects.all()
     queryset = queryset.values('product').annotate(count=Sum('count'), summa=Sum('summa'))
-    print(queryset)
 
     serializer_class = CostOfGoodsSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = CostOfGoodsFilter
+
+
+class ReportSettlementsWithPartners(generics.ListAPIView):
+    queryset = SettlementsWithPartners.objects.all()
+    queryset = queryset.values('partner').annotate(summa=Sum('summa'))
+
+    serializer_class = SettlementsWithPartnersSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = SettlementsWithPartnersFilter
 

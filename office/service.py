@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from .models import Product, Partner, RemainingStock, CostOfGoods
+from .models import Product, Partner, RemainingStock, CostOfGoods, SettlementsWithPartners
 
 
 class PartnerFilter(filters.FilterSet):
@@ -38,3 +38,12 @@ class CostOfGoodsFilter(filters.FilterSet):
     class Meta:
         model = CostOfGoods
         fields = ['product']
+
+
+class SettlementsWithPartnersFilter(filters.FilterSet):
+    partner = CharFilterInFilter(field_name='partner__name', lookup_expr='in')
+
+    class Meta:
+        model = SettlementsWithPartners
+        fields = ['partner']
+
