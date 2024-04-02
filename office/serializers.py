@@ -164,3 +164,9 @@ class RemainingStockSerializer(serializers.Serializer):
     count = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
+class CostOfGoodsSerializer(serializers.Serializer):
+    product = serializers.CharField()
+    count = serializers.DecimalField(max_digits=10, decimal_places=2)
+    summa = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+

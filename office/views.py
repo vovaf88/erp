@@ -9,7 +9,7 @@ from .record_to_registers import (add_goods_to_stock,
                                   update_str_sale,
                                   update_str_purchase
                                   )
-from .service import PartnerFilter, ProductFilter, RemainingStockFilter
+from .service import PartnerFilter, ProductFilter, RemainingStockFilter, CostOfGoodsFilter
 from .models import (Product,
                      ProductCategory,
                      MeasureUnit,
@@ -25,6 +25,7 @@ from .models import (Product,
                      RemainingStock,
                      MoneyOnBank,
                      MoneyOffBank,
+                     CostOfGoods,
                      )
 from .serializers import (ProductSerializer,
                           ProductCategorySerializer,
@@ -45,6 +46,7 @@ from .serializers import (ProductSerializer,
                           MoneyOffBankDetailSerializer,
                           MoneyOnBankDetailSerializer,
                           RemainingStockSerializer,
+                          CostOfGoodsSerializer
                           )
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -426,4 +428,14 @@ class ReportRemainingStock(generics.ListAPIView):
     serializer_class = RemainingStockSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RemainingStockFilter
+
+
+class ReportCostOfGoodsStock(generics.ListAPIView):
+    queryset = CostOfGoods.objects.all()
+    queryset = queryset.values('product').annotate(count=Sum('count'), summa=Sum('summa'))
+    print(queryset)
+
+    serializer_class = CostOfGoodsSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = CostOfGoodsFilter
 
