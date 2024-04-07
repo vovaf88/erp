@@ -95,20 +95,16 @@ def decrease_our_credit(bank_doc):
 
 
 def update_our_credit(bank_doc, doc_pk):
-
     if bank_doc['operation'] == 'Bank_off':
-        SettlementsWithPartners.objects.filter(doc__id=doc_pk).update(
-            doc=MoneyOffBank.objects.get(id=doc_pk),
-            summa=-float(bank_doc['summa']),
-            partner=Partner.objects.get(id=bank_doc['partner'])
-        )
+        doc = MoneyOffBank.objects.get(id=doc_pk)
+        summa = -float(bank_doc['summa'])
+        partner = Partner.objects.get(id=bank_doc['partner'])
+        RecordToRegisters.update_record_settlements(doc, summa, partner)
     elif bank_doc['operation'] == 'Bank_on':
-
-        SettlementsWithPartners.objects.filter(doc__id=doc_pk).update(
-            doc=MoneyOnBank.objects.get(id=doc_pk),
-            summa=float(bank_doc['summa']),
-            partner=Partner.objects.get(id=bank_doc['partner'])
-        )
+        doc = MoneyOnBank.objects.get(id=doc_pk),
+        summa = float(bank_doc['summa']),
+        partner = Partner.objects.get(id=bank_doc['partner'])
+        RecordToRegisters.update_record_settlements(doc, summa, partner)
 
 
 def update_str_sale(instance, request):
@@ -121,8 +117,17 @@ def update_str_sale(instance, request):
     str_doc = StrOfTabSaleOfGood.objects.get(id=instance.id)
     old_sum = str_doc.summa
 
-    RecordToRegisters.update_record_tab_sale_of_good(doc, -count, price, summa, product, instance.id)
-    RecordToRegisters.update_record_remaining_stock(doc, str_doc, product, -count, instance_id):
+    RecordToRegisters.update_record_tab_sale_of_good(doc,
+                                                     -count,
+                                                     price,
+                                                     summa,
+                                                     product,
+                                                     instance.id)
+    RecordToRegisters.update_record_remaining_stock(doc,
+                                                    str_doc,
+                                                    product,
+                                                    -count,
+                                                    instance_id)
 
     cost_summ_count = CostOfGoods.objects.filter(product=product).aggregate(sum_prod=Sum("summa"),
                                                                             count_prod=Sum("count"))
@@ -139,29 +144,26 @@ def update_str_sale(instance, request):
     else:
         cost_price = full_price / remainder * count
 
-    CostOfGoods.objects.filter(pk=instance.id).update(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=-count,
-        summa=-cost_price
-    )
-
-    Revenue.objects.filter(pk=instance.id).update(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=count,
-        summa=summa
-    )
+    RecordToRegisters.update_record_cost(doc,
+                                         product,
+                                         str_doc,
+                                         -count,
+                                         -cost_price,
+                                         instance.id)
+    RecordToRegisters.update_record_revenue(doc,
+                                            product,
+                                            str_doc,
+                                            count,
+                                            summa,
+                                            instance_id)
 
     record_of_settlements_with_partners = SettlementsWithPartners.objects.filter(doc=doc)
     summa_str = record_of_settlements_with_partners[0].summa
-    SettlementsWithPartners.objects.filter(doc=doc).update(
-        doc=doc,
-        summa=float(summa_str)-float(old_sum)+float(summa),
-        partner=doc.partner
-    )
+    summa_settlements = float(summa_str)-float(old_sum)+float(summa)
+
+    RecordToRegisters.update_record_settlements(doc,
+                                                summa_settlements,
+                                                doc.partner)
 
 
 def update_str_purchase(instance, request):
@@ -174,34 +176,30 @@ def update_str_purchase(instance, request):
     str_doc = StrOfTabPurchaseOfGood.objects.get(id=instance.id)
     old_sum = str_doc.summa
 
-    StrOfTabPurchaseOfGood.objects.filter(pk=instance.id).update(
-        count=count,
-        price=price,
-        summa=summa,
-        doc=doc,
-        product=product
-    )
+    RecordToRegisters.update_record_tab_purchase(doc,
+                                                 product,
+                                                 count,
+                                                 price,
+                                                 summa,
+                                                 instance.id)
 
-    CostOfGoods.objects.filter(pk=instance.id).update(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=count,
-        summa=summa
-    )
+    RecordToRegisters.update_record_cost(doc,
+                                         product,
+                                         str_doc,
+                                         count,
+                                         summa,
+                                         instance.id)
 
     record_of_settlements_with_partners = SettlementsWithPartners.objects.filter(doc=doc)
     summa_str = record_of_settlements_with_partners[0].summa
-    SettlementsWithPartners.objects.filter(doc=doc).update(
-        doc=doc,
-        summa=float(summa_str)-float(old_sum)+float(summa),
-        partner=doc.partner
-    )
+    summa_tab = float(summa_str)-float(old_sum)+float(summa)
 
-    RemainingStock.objects.filter(pk=instance.id).update(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=count,
-    )
+    RecordToRegisters.update_record_settlements(doc,
+                                                summa_tab,
+                                                doc.partner)
+    RecordToRegisters.update_record_remaining_stock(doc,
+                                                    str_doc,
+                                                    product,
+                                                    count,
+                                                    instance.id)
 

@@ -75,3 +75,33 @@ class RecordToRegisters:
             product=product,
             count=-count,
         )
+
+    @staticmethod
+    def update_record_cost(doc, product, str_doc, count, summa, instance_id):
+        CostOfGoods.objects.filter(pk=instance_id).update(
+            doc=doc,
+            str_doc=str_doc,
+            product=product,
+            count=-count,
+            summa=-cost_price
+        )
+
+    @staticmethod
+    def update_record_revenue(doc, product, str_doc, count, summa, instance_id):
+        Revenue.objects.filter(pk=instance_id).update(
+            doc=doc,
+            str_doc=str_doc,
+            product=product,
+            count=count,
+            summa=summa
+        )
+
+    @staticmethod
+    def update_record_tab_purchase(doc, product, count, price, summa, instance_id):
+        StrOfTabPurchaseOfGood.objects.filter(pk=instance.id).update(
+            count=count,
+            price=price,
+            summa=summa,
+            doc=doc,
+            product=product
+        )
