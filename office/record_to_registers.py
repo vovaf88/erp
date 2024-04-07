@@ -11,6 +11,7 @@ from .models import (StrOfTabPurchaseOfGood,
                      MoneyOnBank,
                      MoneyOffBank,
                      Partner)
+from .record_to_registers_functions import RecordToRegisters
 
 
 def add_goods_to_stock(data):
@@ -24,38 +25,17 @@ def add_goods_to_stock(data):
     product = Product.objects.get(pk=product_id)
     str_doc = StrOfTabPurchaseOfGood.objects.get(pk=str_doc_id)
 
-    RemainingStock.objects.create(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=count,
-    )
-
-    CostOfGoods.objects.create(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=count,
-        summa=summa
-    )
+    RecordToRegisters.create_record_stock(doc, str_doc, product, count)
+    RecordToRegisters.create_record_cost(doc, str_doc, product, count, summa)
 
     record_of_settlements_with_partners = SettlementsWithPartners.objects.filter(doc=doc)
     print('this doc: ', record_of_settlements_with_partners)
     if not record_of_settlements_with_partners:
-        print('net zapisi')
-        SettlementsWithPartners.objects.create(
-            doc=doc,
-            summa=summa,
-            partner=doc.partner
-        )
+        RecordToRegisters.create_record_settlements(doc, summa, doc.partner)
     else:
-        print('est zapis')
         summa_str = record_of_settlements_with_partners[0].summa
-        SettlementsWithPartners.objects.filter(doc=doc).update(
-            doc=doc,
-            summa=float(summa_str)+float(summa),
-            partner=doc.partner
-        )
+        summa = float(summa_str) + float(summa)
+        RecordToRegisters.update_record_settlements(doc, summa, doc.partner)
 
 
 def remove_goods_from_stock(data):
@@ -68,14 +48,11 @@ def remove_goods_from_stock(data):
     doc = SaleOfGood.objects.get(pk=doc_id)
     product = Product.objects.get(pk=product_id)
     str_doc = StrOfTabSaleOfGood.objects.get(pk=str_doc_id)
-    #old_sum = str_doc.summa
 
     cost_summ_count = CostOfGoods.objects.filter(product=product).aggregate(sum_prod=Sum("summa"),
                                                                             count_prod=Sum("count"))
     remainder = float(cost_summ_count['count_prod'])
     full_price = float(cost_summ_count['sum_prod'])
-
-    #print('remainder= ', remainder, ', full_price= ', full_price, ', count= ', count, ', summa=', summa)
 
     # check remainder of product
     if remainder < count:
@@ -87,70 +64,37 @@ def remove_goods_from_stock(data):
     else:
         cost_price = full_price / remainder * count
 
-    RemainingStock.objects.create(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=-count,
-    )
-
-    CostOfGoods.objects.create(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=-count,
-        summa=-cost_price
-    )
-
-    Revenue.objects.create(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=count,
-        summa=summa
-    )
+    RecordToRegisters.create_record_stock(doc, str_doc, product, -count)
+    RecordToRegisters.create_record_cost(doc, str_doc, product, -count, -cost_price)
+    RecordToRegisters.create_record_revenue(doc, str_doc, product, count, summa)
 
     record_of_settlements_with_partners = SettlementsWithPartners.objects.filter(doc=doc)
     print('this doc: ', record_of_settlements_with_partners)
     if not record_of_settlements_with_partners:
-        print('net zapisi')
-        SettlementsWithPartners.objects.create(
-            doc=doc,
-            summa=-summa,
-            partner=doc.partner
-        )
+        RecordToRegisters.create_record_settlements(doc, -summa, doc.partner)
     else:
-        print('est zapis')
         summa_str = record_of_settlements_with_partners[0].summa
-        SettlementsWithPartners.objects.filter(doc=doc).update(
-            doc=doc,
-            summa=float(summa_str)-float(summa),
-            partner=doc.partner
-        )
+        summa = float(summa_str) - float(summa)
+        RecordToRegisters.update_record_settlements(doc, summa, doc.partner)
 
     return True
 
 
 def increase_our_credit(bank_doc):
-    # {'id': 4, 'number': '3', 'doc_date': '2024-03-24T16:30:00Z', 'summa': '1000.00', 'operation': 3, 'my_company': 1, 'partner': 6}
-    SettlementsWithPartners.objects.create(
-        doc=MoneyOnBank.objects.get(id=bank_doc['id']),
-        summa=float(bank_doc['summa']),
-        partner=Partner.objects.get(id=bank_doc['partner'])
-    )
+    doc = MoneyOnBank.objects.get(id=bank_doc['id'])
+    summa = float(bank_doc['summa'])
+    partner = Partner.objects.get(id=bank_doc['partner'])
+    RecordToRegisters.create_record_settlements(doc, summa, partner)
 
 
 def decrease_our_credit(bank_doc):
-    SettlementsWithPartners.objects.create(
-        doc=MoneyOffBank.objects.get(id=bank_doc['id']),
-        summa=-float(bank_doc['summa']),
-        partner=Partner.objects.get(id=bank_doc['partner'])
-    )
+    doc = MoneyOffBank.objects.get(id=bank_doc['id'])
+    summa = -float(bank_doc['summa'])
+    partner = Partner.objects.get(id=bank_doc['partner'])
+    RecordToRegisters.create_record_settlements(doc, summa, partner)
 
 
 def update_our_credit(bank_doc, doc_pk):
-
-    # <QueryDict: {'number': ['1'], 'doc_date': ['2024-03-19T22:34'], 'operation': ['Bank_off'], 'my_company': ['1'], 'partner': ['1'], 'summa': ['400']}> 12
 
     if bank_doc['operation'] == 'Bank_off':
         SettlementsWithPartners.objects.filter(doc__id=doc_pk).update(
@@ -176,22 +120,9 @@ def update_str_sale(instance, request):
     product = Product.objects.get(id=data['product'])
     str_doc = StrOfTabSaleOfGood.objects.get(id=instance.id)
     old_sum = str_doc.summa
-# {'count': ['2.000'], 'price': ['200.00'], 'summa': ['400.00'], 'doc': ['4'], 'product': ['1']}>
 
-    StrOfTabSaleOfGood.objects.filter(pk=instance.id).update(
-        count=count,
-        price=price,
-        summa=summa,
-        doc=doc,
-        product=product
-    )
-
-    RemainingStock.objects.filter(pk=instance.id).update(
-        doc=doc,
-        str_doc=str_doc,
-        product=product,
-        count=-count,
-    )
+    RecordToRegisters.update_record_tab_sale_of_good(doc, -count, price, summa, product, instance.id)
+    RecordToRegisters.update_record_remaining_stock(doc, str_doc, product, -count, instance_id):
 
     cost_summ_count = CostOfGoods.objects.filter(product=product).aggregate(sum_prod=Sum("summa"),
                                                                             count_prod=Sum("count"))
